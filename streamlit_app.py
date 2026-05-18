@@ -1,4 +1,6 @@
 import streamlit as st
+import os
+os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
 from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage, AIMessage
 
