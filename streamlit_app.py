@@ -227,15 +227,15 @@ if uploaded_file:
         file_content = df.to_string(index=False)
         st.dataframe(df.head(8), use_container_width=True)
         st.success(f"✅ CSV ready — {len(df)} records")
-    elif uploaded_file.name.endswith(".xlsx"):
+    elifelif uploaded_file.name.endswith(".xlsx"):
         df = pd.read_excel(uploaded_file)
-        file_content = df.to_string(index=False)
+        file_content = df.head(80).to_string(index=False)
         st.dataframe(df.head(8), use_container_width=True)
         st.success(f"✅ Excel ready — {len(df)} records")
 
 llm = ChatGroq(model="llama-3.3-70b-versatile")
 
-system_prompt = """You are JIVO OIL AI Assistant — a professional corporate AI for JIVO OIL company.
+system_prompt = """You are JIVO OIL AI Assistant — a professional corporate AI for JIVO OIL company. You help with employee data, hierarchy, HR reports, and any uploaded company files. Always analyze uploaded data and answer questions about it. Be professional and helpful."""
 
 STRICT RULES:
 - ONLY answer questions about JIVO OIL: its employees, hierarchy, departments, products, edible oils, operations, HR data, and company matters.
