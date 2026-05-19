@@ -15,117 +15,105 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    .main { background-color: #f8f9fa; }
-    .stApp { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .stApp {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #e8f5e9 100%);
+    }
     .main .block-container {
         background-color: white;
         border-radius: 20px;
         padding: 2rem;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
-    .stChatMessage {
-        border-radius: 15px;
-        margin: 5px 0;
-    }
-    .stButton > button {
-        background: linear-gradient(90deg, #1e3a5f, #2196F3);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        padding: 0.5rem 1rem;
-        font-weight: bold;
-    }
-    .stButton > button:hover {
-        background: linear-gradient(90deg, #2196F3, #1e3a5f);
-        transform: translateY(-2px);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
     }
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1e3a5f 0%, #2196F3 100%);
-        color: white;
+        background: linear-gradient(180deg, #1565c0 0%, #0d47a1 100%);
     }
-    [data-testid="stSidebar"] * {
+    [data-testid="stSidebar"] * { color: white !important; }
+    .stButton > button {
+        background: linear-gradient(90deg, #1565c0, #42a5f5);
         color: white !important;
+        border: none;
+        border-radius: 10px;
+        font-weight: bold;
+        transition: all 0.3s;
     }
-    .login-box {
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(21,101,192,0.4);
+    }
+    .login-container {
         background: white;
-        padding: 2rem;
+        padding: 2.5rem;
         border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        max-width: 400px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        max-width: 420px;
         margin: auto;
-        margin-top: 5rem;
+    }
+    .chat-header {
+        background: linear-gradient(90deg, #1565c0, #42a5f5);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 1.5rem;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Login System
-USERS = {
-    "admin": "jivo123",
-    "hr": "hr123",
-    "manager": "manager123"
-}
+USERS = {"aiuser": "ai@1234"}
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
     st.session_state.username = ""
+if "history" not in st.session_state:
+    st.session_state.history = []
 
 if not st.session_state.logged_in:
     st.markdown("""
-    <div style='text-align:center; padding: 2rem;'>
-        <h1 style='color:white; font-size:3rem;'>🛢️ JIVO OIL</h1>
-        <h3 style='color:white;'>AI Assistant</h3>
+    <div style='text-align:center; padding:2rem 0;'>
+        <h1 style='color:#1565c0; font-size:3rem;'>🛢️ JIVO OIL</h1>
+        <p style='color:#555; font-size:1.2rem;'>AI Assistant Platform</p>
     </div>
     """, unsafe_allow_html=True)
-    
-    col1, col2, col3 = st.columns([1,2,1])
+
+    col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.markdown("<div class='login-box'>", unsafe_allow_html=True)
-        st.markdown("### 🔐 Login")
-        username = st.text_input("Username", placeholder="Enter username")
-        password = st.text_input("Password", type="password", placeholder="Enter password")
-        
-        if st.button("Login", use_container_width=True):
+        st.markdown("<div class='login-container'>", unsafe_allow_html=True)
+        st.markdown("### 🔐 Secure Login")
+        st.markdown("---")
+        username = st.text_input("👤 Username", placeholder="Enter your username")
+        password = st.text_input("🔑 Password", type="password", placeholder="Enter your password")
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("🚀 Login", use_container_width=True):
             if username in USERS and USERS[username] == password:
                 st.session_state.logged_in = True
                 st.session_state.username = username
                 st.rerun()
             else:
-                st.error("❌ Invalid username or password!")
-        
+                st.error("❌ Invalid credentials! Please try again.")
         st.markdown("</div>", unsafe_allow_html=True)
-        st.markdown("""
-        <div style='text-align:center; color:white; margin-top:1rem;'>
-            <small>Demo: admin / jivo123</small>
-        </div>
-        """, unsafe_allow_html=True)
     st.stop()
-
-# Main App (After Login)
-if "history" not in st.session_state:
-    st.session_state.history = []
 
 # Sidebar
 with st.sidebar:
     st.markdown(f"""
     <div style='text-align:center; padding:1rem;'>
         <h2>🛢️ JIVO OIL</h2>
-        <p>AI Assistant</p>
+        <p style='font-size:0.9rem;'>AI Assistant</p>
         <hr style='border-color:rgba(255,255,255,0.3);'>
-        <p>👤 Welcome, <b>{st.session_state.username.upper()}</b></p>
+        <p>👤 <b>{st.session_state.username.upper()}</b></p>
     </div>
     """, unsafe_allow_html=True)
-    
+
     st.markdown("### 💬 Chat History")
     if st.session_state.history:
-        for i, msg in enumerate(st.session_state.history):
+        for msg in st.session_state.history:
             if isinstance(msg, HumanMessage):
-                content = msg.content[:30] + "..." if len(msg.content) > 30 else msg.content
+                content = msg.content.split("User: ")[-1][:35] + "..."
                 st.markdown(f"<small>🗨️ {content}</small>", unsafe_allow_html=True)
     else:
         st.markdown("<small>No messages yet</small>", unsafe_allow_html=True)
-    
+
     st.markdown("---")
-    
     col1, col2 = st.columns(2)
     with col1:
         if st.button("🗑️ Clear", use_container_width=True):
@@ -136,30 +124,25 @@ with st.sidebar:
             st.session_state.logged_in = False
             st.session_state.history = []
             st.rerun()
-    
+
     language = st.selectbox("🌐 Language", ["English", "Hindi", "Both"])
 
-# Main Content
+# Main
 st.markdown("""
-<div style='text-align:center; padding:1rem 0;'>
-    <h1 style='color:#1e3a5f;'>🛢️ JIVO OIL AI Assistant</h1>
-    <p style='color:#666;'>Powered by Advanced AI Technology</p>
-    <hr>
+<div class='chat-header'>
+    <h2>🛢️ JIVO OIL AI Assistant</h2>
+    <p style='margin:0; opacity:0.9;'>Your intelligent company assistant</p>
 </div>
 """, unsafe_allow_html=True)
 
-# File Upload
 with st.expander("📎 Upload File (PDF, CSV, Image, TXT)"):
-    uploaded_file = st.file_uploader(
-        "Choose a file",
-        type=["pdf", "png", "jpg", "jpeg", "txt", "csv"]
-    )
+    uploaded_file = st.file_uploader("Choose a file", type=["pdf", "png", "jpg", "jpeg", "txt", "csv"])
 
 file_content = ""
 if uploaded_file:
     if uploaded_file.type == "text/plain":
         file_content = uploaded_file.read().decode("utf-8")
-        st.success(f"✅ Text file loaded!")
+        st.success("✅ Text file loaded!")
     elif uploaded_file.type in ["image/png", "image/jpeg"]:
         st.image(uploaded_file, width=300)
         file_content = "User uploaded image: " + uploaded_file.name
@@ -177,7 +160,19 @@ if uploaded_file:
 
 llm = ChatGroq(model="llama-3.3-70b-versatile")
 
-# Chat Display
+system_prompt = """You are JIVO OIL AI Assistant - a professional corporate AI.
+STRICT RULES:
+- ONLY answer questions related to JIVO OIL company, its employees, hierarchy, products, operations, and HR matters.
+- If someone asks anything NOT related to JIVO OIL, respond: 'I can only assist with JIVO OIL related queries. Please ask about our company, employees, or operations.'
+- Be professional, helpful and concise.
+- If file data is provided, use it to answer questions accurately."""
+
+lang_map = {
+    "English": "Respond in English only.",
+    "Hindi": "Sirf Hindi mein jawab do.",
+    "Both": "Respond in both Hindi and English."
+}
+
 for msg in st.session_state.history:
     if isinstance(msg, HumanMessage):
         with st.chat_message("user", avatar="👤"):
@@ -187,26 +182,20 @@ for msg in st.session_state.history:
         with st.chat_message("assistant", avatar="🛢️"):
             st.write(msg.content)
 
-# Chat Input
-user_input = st.chat_input("Ask me anything about JIVO OIL...")
+user_input = st.chat_input("Ask about JIVO OIL employees, hierarchy, products...")
 
 if user_input:
-    lang_map = {"English": "Respond in English.", "Hindi": "Hindi mein jawab do.", "Both": "Respond in both Hindi and English."}
-    
     if file_content:
-        full_input = f"{lang_map[language]}\n\nFile data:\n{file_content}\n\nUser: {user_input}"
+        full_input = f"{system_prompt}\n{lang_map[language]}\n\nFile data:\n{file_content}\n\nUser: {user_input}"
     else:
-        full_input = f"{lang_map[language]}\n\nUser: {user_input}"
-    
+        full_input = f"{system_prompt}\n{lang_map[language]}\n\nUser: {user_input}"
+
     st.session_state.history.append(HumanMessage(content=full_input))
-    
     with st.chat_message("user", avatar="👤"):
         st.write(user_input)
-    
     with st.chat_message("assistant", avatar="🛢️"):
         with st.spinner("Thinking..."):
             response = llm.invoke(st.session_state.history)
             st.write(response.content)
-    
     st.session_state.history.append(AIMessage(content=response.content))
     st.rerun()
