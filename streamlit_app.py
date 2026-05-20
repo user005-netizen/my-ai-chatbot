@@ -14,9 +14,6 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
 
 st.set_page_config(page_title="JIVO Wellness AI", page_icon="🌿", layout="wide")
-
-st.markdown("""
-<style>
 st.markdown("""
 <style>
 .stApp { background: #f9fafb; }
@@ -224,8 +221,17 @@ with st.sidebar:
 
 # Main area
 st.markdown("""
-<div style='text-align:center; background:linear-gradient(90deg,#1b5e20,#2e7d32); color:white; padding:1.2rem; border-radius:15px; margin-bottom:1.5rem;'>
-    <h2 style='margin:0;'>🌿 JIVO Wellness AI Assistant</h2>
+st.markdown("""
+<div style='background:white; border:1.5px solid #c8e6c9; border-left:5px solid #2e7d32;
+border-radius:12px; padding:1.2rem 1.5rem; margin-bottom:1.5rem; display:flex;
+align-items:center; gap:12px;'>
+    <span style='font-size:2rem;'>🌿</span>
+    <div>
+        <div style='font-size:1.2rem; font-weight:600; color:#1b5e20;'>JIVO Wellness AI Assistant</div>
+        <div style='font-size:0.85rem; color:#555;'>Powered by Advanced AI — Purity For Charity</div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
     <p style='margin:0; opacity:0.85; font-size:0.9rem;'>Powered by Advanced AI — Purity For Charity</p>
 </div>
 """, unsafe_allow_html=True)
