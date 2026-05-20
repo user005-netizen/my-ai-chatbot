@@ -16,34 +16,93 @@ st.set_page_config(page_title="JIVO Wellness AI", page_icon="🌿", layout="wide
 
 st.markdown("""
 <style>
-.stApp { background: #f9fafb; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* { font-family: 'Inter', sans-serif; }
+
+.stApp { background: #f0f7f0; }
+
 .main .block-container {
     background: white;
-    border-radius: 16px;
+    border-radius: 20px;
     padding: 2rem;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
-    border: 1px solid #e8f5e9;
+    box-shadow: 0 2px 20px rgba(46,125,50,0.08);
 }
+
 [data-testid="stSidebar"] {
-    background: white;
-    border-right: 1px solid #e8f5e9;
+    background: linear-gradient(180deg, #1a3c1a 0%, #2d5a2d 100%) !important;
 }
-[data-testid="stSidebar"] * { color: #1b5e20 !important; }
+[data-testid="stSidebar"] * { color: white !important; }
+[data-testid="stSidebar"] .stMarkdown p { color: #c8e6c9 !important; }
+
 .stButton > button {
-    background: white !important;
-    color: #2e7d32 !important;
-    border: 1.5px solid #2e7d32 !important;
-    border-radius: 8px;
-    font-weight: 500;
+    background: transparent !important;
+    color: white !important;
+    border: 1px solid rgba(255,255,255,0.4) !important;
+    border-radius: 8px !important;
+    font-size: 0.8rem !important;
+    transition: all 0.2s !important;
 }
 .stButton > button:hover {
-    background: #2e7d32 !important;
+    background: rgba(255,255,255,0.15) !important;
+    border-color: white !important;
+}
+
+.product-card {
+    background: linear-gradient(135deg, #f1f8e9, #e8f5e9);
+    border: 1px solid #c8e6c9;
+    border-left: 4px solid #2e7d32;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.product-card:hover {
+    background: linear-gradient(135deg, #e8f5e9, #dcedc8);
+    transform: translateX(3px);
+    box-shadow: 0 2px 8px rgba(46,125,50,0.2);
+}
+.product-name {
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: #1b5e20;
+    margin-bottom: 2px;
+}
+.product-price {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #2e7d32;
+}
+.product-cat {
+    font-size: 0.7rem;
+    color: #66bb6a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stChatMessage {
+    background: #f9fdf9 !important;
+    border-radius: 12px !important;
+    margin-bottom: 8px !important;
+}
+
+.stSelectbox > div > div {
+    background: rgba(255,255,255,0.1) !important;
+    border-color: rgba(255,255,255,0.3) !important;
     color: white !important;
+    border-radius: 8px !important;
+}
+
+div[data-testid="stExpander"] {
+    background: #f9fdf9;
+    border: 1px solid #c8e6c9;
+    border-radius: 12px;
 }
 </style>
 """, unsafe_allow_html=True)
 
-for key in ["logged_in", "user_id", "user_email", "access_token", "history"]:
+for key in ["logged_in", "user_id", "user_email", "access_token", "history", "selected_product"]:
     if key not in st.session_state:
         st.session_state[key] = [] if key == "history" else None
 if "logged_in" not in st.session_state:
@@ -81,19 +140,21 @@ def load_products():
 
 if not st.session_state.logged_in:
     st.markdown("""
-    <div style='text-align:center; padding:2rem 0;'>
-        <h1 style='color:#1b5e20; font-size:3rem;'>JIVO Wellness</h1>
-        <p style='color:#555; font-size:1.1rem;'>AI Assistant - Purity For Charity</p>
+    <div style='text-align:center; padding:3rem 0 1rem 0;'>
+        <div style='display:inline-block; background:linear-gradient(135deg,#1b5e20,#2e7d32);
+        padding:16px 32px; border-radius:16px; margin-bottom:1.5rem;'>
+            <h1 style='color:white; margin:0; font-size:2rem; font-weight:700; letter-spacing:2px;'>JIVO WELLNESS</h1>
+            <p style='color:#a5d6a7; margin:4px 0 0 0; font-size:0.9rem; letter-spacing:1px;'>PURITY FOR CHARITY</p>
+        </div>
+        <p style='color:#555; font-size:1rem;'>Your Personal Wellness AI Assistant</p>
     </div>
     """, unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns([1, 2, 1])
+    col1, col2, col3 = st.columns([1, 1.5, 1])
     with col2:
         tab1, tab2 = st.tabs(["Login", "Sign Up"])
-
         with tab1:
-            st.markdown("### Welcome back!")
-            email = st.text_input("Email", key="login_email", placeholder="your@email.com")
+            email = st.text_input("Email Address", key="login_email", placeholder="your@email.com")
             password = st.text_input("Password", type="password", key="login_pass", placeholder="Enter password")
             if st.button("Login", use_container_width=True, key="login_btn"):
                 if email and password:
@@ -109,13 +170,11 @@ if not st.session_state.logged_in:
                         st.error(f"Login failed: {str(e)}")
                 else:
                     st.warning("Please fill in all fields!")
-
         with tab2:
-            st.markdown("### Create account")
-            new_email = st.text_input("Email", key="signup_email", placeholder="your@email.com")
+            new_email = st.text_input("Email Address", key="signup_email", placeholder="your@email.com")
             new_pass = st.text_input("Password", type="password", key="signup_pass", placeholder="Min 6 characters")
             new_pass2 = st.text_input("Confirm Password", type="password", key="signup_pass2", placeholder="Repeat password")
-            if st.button("Sign Up", use_container_width=True, key="signup_btn"):
+            if st.button("Create Account", use_container_width=True, key="signup_btn"):
                 if new_email and new_pass and new_pass2:
                     if new_pass != new_pass2:
                         st.error("Passwords do not match!")
@@ -124,7 +183,7 @@ if not st.session_state.logged_in:
                     else:
                         try:
                             res = supabase.auth.sign_up({"email": new_email, "password": new_pass})
-                            st.success("Account created! Please check your email to verify, then login.")
+                            st.success("Account created! Check your email to verify, then login.")
                         except Exception as e:
                             st.error(f"Signup failed: {str(e)}")
                 else:
@@ -168,27 +227,19 @@ STRICT RULES:
 
 with st.sidebar:
     st.markdown(f"""
-    <div style='text-align:center; padding:1rem 0;'>
-        <h2 style='color:#1b5e20;'>JIVO Wellness</h2>
-        <p style='font-size:0.85rem; color:#555;'>AI Assistant</p>
-        <hr style='border-color:#e8f5e9;'>
-        <p style='font-size:0.85rem; color:#333;'>Logged in as:<br><b>{st.session_state.user_email}</b></p>
+    <div style='text-align:center; padding:1.5rem 0 1rem 0;'>
+        <div style='background:rgba(255,255,255,0.1); border-radius:12px; padding:12px; margin-bottom:12px;'>
+            <div style='font-size:1.3rem; font-weight:700; letter-spacing:2px; color:white;'>JIVO WELLNESS</div>
+            <div style='font-size:0.7rem; color:#a5d6a7; letter-spacing:1px;'>PURITY FOR CHARITY</div>
+        </div>
+        <div style='font-size:0.75rem; color:#a5d6a7;'>Logged in as</div>
+        <div style='font-size:0.85rem; font-weight:600; color:white;'>{st.session_state.user_email}</div>
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("### Chat History")
-    if st.session_state.history:
-        for msg in st.session_state.history:
-            if isinstance(msg, HumanMessage):
-                preview = msg.content[:35] + "..." if len(msg.content) > 35 else msg.content
-                st.markdown(f"<small>{preview}</small>", unsafe_allow_html=True)
-    else:
-        st.markdown("<small>No messages yet</small>", unsafe_allow_html=True)
-
-    st.markdown("---")
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("Clear", use_container_width=True):
+        if st.button("Clear Chat", use_container_width=True):
             supabase.table("chat_history").delete().eq("user_id", st.session_state.user_id).execute()
             st.session_state.history = []
             st.rerun()
@@ -200,24 +251,66 @@ with st.sidebar:
             st.session_state.logged_in = False
             st.rerun()
 
+    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
     language = st.selectbox("Language", ["English", "Hindi", "Both"])
 
-    st.markdown("---")
-    st.markdown("### Our Products")
-    for p in products:
-        st.markdown(f"<small><b>{p['name']}</b><br>Rs. {p['price']}</small>", unsafe_allow_html=True)
-        st.markdown("---")
+    st.markdown("""
+    <div style='margin-top:16px; margin-bottom:8px; font-size:0.8rem; font-weight:600;
+    color:#a5d6a7; text-transform:uppercase; letter-spacing:1px;'>Our Products</div>
+    """, unsafe_allow_html=True)
 
+    category_icons = {
+        "Edible Oil": "🫙",
+        "Olive Oil": "🫒",
+        "Ghee": "🥛",
+        "Health Drinks": "🥤",
+        "Nutraceuticals": "💊",
+        "Seeds": "🌱",
+        "Beverages": "☕",
+        "Honey": "🍯",
+        "Snacks": "🥜"
+    }
+
+    for p in products:
+        icon = category_icons.get(p['category'], "🌿")
+        if st.button(f"{icon} {p['name']} - Rs.{p['price']}", key=f"prod_{p['id']}", use_container_width=True):
+            st.session_state.selected_product = p['name']
+            st.rerun()
+
+# Main area
 st.markdown("""
-<div style='background:white; border:1.5px solid #c8e6c9; border-left:5px solid #2e7d32;
-border-radius:12px; padding:1.2rem 1.5rem; margin-bottom:1.5rem; display:flex;
-align-items:center; gap:12px;'>
+<div style='background:linear-gradient(135deg, #1b5e20, #2e7d32);
+border-radius:16px; padding:1.5rem 2rem; margin-bottom:1.5rem;
+display:flex; align-items:center; justify-content:space-between;'>
     <div>
-        <div style='font-size:1.2rem; font-weight:600; color:#1b5e20;'>JIVO Wellness AI Assistant</div>
-        <div style='font-size:0.85rem; color:#555;'>Powered by Advanced AI - Purity For Charity</div>
+        <div style='font-size:1.4rem; font-weight:700; color:white; letter-spacing:1px;'>JIVO Wellness AI Assistant</div>
+        <div style='font-size:0.85rem; color:#a5d6a7; margin-top:4px;'>Powered by Advanced AI - Purity For Charity</div>
+    </div>
+    <div style='text-align:right;'>
+        <div style='font-size:0.75rem; color:#a5d6a7;'>India No.1</div>
+        <div style='font-size:0.8rem; color:white; font-weight:500;'>Cold Press Canola Oil</div>
     </div>
 </div>
 """, unsafe_allow_html=True)
+
+if st.session_state.selected_product:
+    product_name = st.session_state.selected_product
+    matched = [p for p in products if p['name'] == product_name]
+    if matched:
+        p = matched[0]
+        st.markdown(f"""
+        <div style='background:linear-gradient(135deg,#e8f5e9,#f1f8e9); border:1.5px solid #a5d6a7;
+        border-left:5px solid #2e7d32; border-radius:12px; padding:1.2rem 1.5rem; margin-bottom:1rem;'>
+            <div style='font-size:1rem; font-weight:700; color:#1b5e20; margin-bottom:6px;'>{p['name']}</div>
+            <div style='font-size:1.3rem; font-weight:800; color:#2e7d32; margin-bottom:6px;'>Rs. {p['price']}</div>
+            <div style='font-size:0.85rem; color:#555; margin-bottom:4px;'>{p['description']}</div>
+            <div style='font-size:0.75rem; color:#66bb6a; text-transform:uppercase; letter-spacing:0.5px;'>{p['category']}</div>
+            <div style='margin-top:8px; font-size:0.8rem; color:#2e7d32;'>Buy at: shop.jivo.in</div>
+        </div>
+        """, unsafe_allow_html=True)
+    if st.button("Close", key="close_product"):
+        st.session_state.selected_product = None
+        st.rerun()
 
 with st.expander("Upload File (PDF, CSV, Image, TXT)"):
     uploaded_file = st.file_uploader("Choose a file", type=["pdf", "png", "jpg", "jpeg", "txt", "csv"])
