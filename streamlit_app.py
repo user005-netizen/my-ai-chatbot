@@ -6,7 +6,6 @@ import os
 import pypdf
 import pandas as pd
 
-# Config
 SUPABASE_URL = "https://icfcetgzwumpdcfzahcx.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljZmNldGd6d3VtcGRjZnphaGN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNTA5MzUsImV4cCI6MjA5NDgyNjkzNX0.KIBajkD_sQ-fq_Rwe4_zy86pEWHozXiMM6bydZ9jPDg"
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
@@ -14,6 +13,7 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
 
 st.set_page_config(page_title="JIVO Wellness AI", page_icon="🌿", layout="wide")
+
 st.markdown("""
 <style>
 .stApp { background: #f9fafb; }
@@ -35,22 +35,14 @@ st.markdown("""
     border: 1.5px solid #2e7d32 !important;
     border-radius: 8px;
     font-weight: 500;
-    transition: all 0.2s;
 }
 .stButton > button:hover {
     background: #2e7d32 !important;
     color: white !important;
 }
-.stTextInput > div > input, .stSelectbox > div {
-    border-color: #c8e6c9 !important;
-    border-radius: 8px !important;
-}
-</style>
-""", unsafe_allow_html=True)
 </style>
 """, unsafe_allow_html=True)
 
-# Session state init
 for key in ["logged_in", "user_id", "user_email", "access_token", "history"]:
     if key not in st.session_state:
         st.session_state[key] = [] if key == "history" else None
@@ -87,11 +79,10 @@ def load_products():
     except:
         return []
 
-# ── LOGIN / SIGNUP PAGE ──────────────────────────────────────────────
 if not st.session_state.logged_in:
     st.markdown("""
     <div style='text-align:center; padding:2rem 0;'>
-        <h1 style='color:#1b5e20; font-size:3rem;'> JIVO Wellness</h1>
+        <h1 style='color:#1b5e20; font-size:3rem;'>JIVO Wellness</h1>
         <p style='color:#555; font-size:1.1rem;'>AI Assistant - Purity For Charity</p>
     </div>
     """, unsafe_allow_html=True)
@@ -133,29 +124,28 @@ if not st.session_state.logged_in:
                     else:
                         try:
                             res = supabase.auth.sign_up({"email": new_email, "password": new_pass})
-                            st.success("Account created! Please check your email to verify your account, then login.")
+                            st.success("Account created! Please check your email to verify, then login.")
                         except Exception as e:
                             st.error(f"Signup failed: {str(e)}")
                 else:
                     st.warning("Please fill in all fields!")
     st.stop()
 
-# ── MAIN APP (after login) ────────────────────────────────────────────
 llm = ChatGroq(model="llama-3.3-70b-versatile")
 products = load_products()
 
 products_text = ""
 for p in products:
-    products_text += f"- {p['name']}: Rs.{p['price']} — {p['description']} (Category: {p['category']})\n"
+    products_text += f"- {p['name']}: Rs.{p['price']} - {p['description']} (Category: {p['category']})\n"
 
-system_prompt = f"""You are JIVO Wellness AI Assistant — a professional corporate AI for JIVO Wellness company.
+system_prompt = f"""You are JIVO Wellness AI Assistant - a professional corporate AI for JIVO Wellness company.
 
 COMPANY KNOWLEDGE BASE:
 === ABOUT JIVO ===
 - Full Name: JIVO Wellness | Tagline: Purity For Charity
 - India's Largest Seller of Cold Press Canola Oil
 - India's First Patented Wheatgrass Products
-- 15+ years in wellness | ISO & Sedex Certified
+- 15+ years in wellness | ISO and Sedex Certified
 - Address: J3/190, Nehru Market, Rajouri Garden, New Delhi 110027
 - Email: Info@jivo.in | Toll Free: 1800 137 4433
 - Shop: shop.jivo.in
@@ -176,63 +166,60 @@ STRICT RULES:
 - If unrelated question asked, say: I can only assist with JIVO Wellness related queries.
 - Be professional, warm and helpful."""
 
-# Sidebar
 with st.sidebar:
     st.markdown(f"""
     <div style='text-align:center; padding:1rem 0;'>
-        <h2> JIVO Wellness</h2>
-        <p style='font-size:0.85rem; opacity:0.8;'>AI Assistant</p>
-        <hr style='border-color:rgba(255,255,255,0.2);'>
-        <p style='font-size:0.85rem;'>Logged in as:<br><b>{st.session_state.user_email}</b></p>
+        <h2 style='color:#1b5e20;'>JIVO Wellness</h2>
+        <p style='font-size:0.85rem; color:#555;'>AI Assistant</p>
+        <hr style='border-color:#e8f5e9;'>
+        <p style='font-size:0.85rem; color:#333;'>Logged in as:<br><b>{st.session_state.user_email}</b></p>
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("### 💬 Chat History")
+    st.markdown("### Chat History")
     if st.session_state.history:
         for msg in st.session_state.history:
             if isinstance(msg, HumanMessage):
                 preview = msg.content[:35] + "..." if len(msg.content) > 35 else msg.content
-                st.markdown(f"<small>🗨️ {preview}</small>", unsafe_allow_html=True)
+                st.markdown(f"<small>{preview}</small>", unsafe_allow_html=True)
     else:
         st.markdown("<small>No messages yet</small>", unsafe_allow_html=True)
 
     st.markdown("---")
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("🗑️ Clear", use_container_width=True):
+        if st.button("Clear", use_container_width=True):
             supabase.table("chat_history").delete().eq("user_id", st.session_state.user_id).execute()
             st.session_state.history = []
             st.rerun()
     with col2:
-        if st.button("🚪 Logout", use_container_width=True):
+        if st.button("Logout", use_container_width=True):
             supabase.auth.sign_out()
             for key in ["logged_in", "user_id", "user_email", "access_token", "history"]:
                 st.session_state[key] = [] if key == "history" else None
             st.session_state.logged_in = False
             st.rerun()
 
-    language = st.selectbox("🌐 Language", ["English", "Hindi", "Both"])
+    language = st.selectbox("Language", ["English", "Hindi", "Both"])
 
     st.markdown("---")
-    st.markdown("### 🛍️ Our Products")
+    st.markdown("### Our Products")
     for p in products:
         st.markdown(f"<small><b>{p['name']}</b><br>Rs. {p['price']}</small>", unsafe_allow_html=True)
         st.markdown("---")
 
-# Main area
 st.markdown("""
 <div style='background:white; border:1.5px solid #c8e6c9; border-left:5px solid #2e7d32;
 border-radius:12px; padding:1.2rem 1.5rem; margin-bottom:1.5rem; display:flex;
 align-items:center; gap:12px;'>
-    <span style='font-size:2rem;'>🌿</span>
     <div>
         <div style='font-size:1.2rem; font-weight:600; color:#1b5e20;'>JIVO Wellness AI Assistant</div>
-        <div style='font-size:0.85rem; color:#555;'>Powered by Advanced AI — Purity For Charity</div>
+        <div style='font-size:0.85rem; color:#555;'>Powered by Advanced AI - Purity For Charity</div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-with st.expander("📎 Upload File (PDF, CSV, Image, TXT)"):
+with st.expander("Upload File (PDF, CSV, Image, TXT)"):
     uploaded_file = st.file_uploader("Choose a file", type=["pdf", "png", "jpg", "jpeg", "txt", "csv"])
 
 file_content = ""
@@ -261,7 +248,6 @@ lang_map = {
     "Both": "Respond in both Hindi and English."
 }
 
-# Display chat history
 for msg in st.session_state.history:
     if isinstance(msg, HumanMessage):
         with st.chat_message("user", avatar="👤"):
@@ -271,7 +257,6 @@ for msg in st.session_state.history:
         with st.chat_message("assistant", avatar="🌿"):
             st.write(msg.content)
 
-# Chat input
 user_input = st.chat_input("Ask about JIVO products, prices, wellness tips...")
 
 if user_input:
