@@ -91,7 +91,7 @@ def load_products():
 if not st.session_state.logged_in:
     st.markdown("""
     <div style='text-align:center; padding:2rem 0;'>
-        <h1 style='color:#1b5e20; font-size:3rem;'>🌿 JIVO Wellness</h1>
+        <h1 style='color:#1b5e20; font-size:3rem;'> JIVO Wellness</h1>
         <p style='color:#555; font-size:1.1rem;'>AI Assistant — Purity For Charity</p>
     </div>
     """, unsafe_allow_html=True)
@@ -180,7 +180,7 @@ STRICT RULES:
 with st.sidebar:
     st.markdown(f"""
     <div style='text-align:center; padding:1rem 0;'>
-        <h2>🌿 JIVO Wellness</h2>
+        <h2> JIVO Wellness</h2>
         <p style='font-size:0.85rem; opacity:0.8;'>AI Assistant</p>
         <hr style='border-color:rgba(255,255,255,0.2);'>
         <p style='font-size:0.85rem;'>Logged in as:<br><b>{st.session_state.user_email}</b></p>
