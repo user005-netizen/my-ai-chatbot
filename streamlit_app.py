@@ -17,13 +17,39 @@ st.set_page_config(page_title="JIVO Wellness AI", page_icon="🌿", layout="wide
 
 st.markdown("""
 <style>
-.stApp { background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%); }
-.main .block-container { background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 8px 32px rgba(0,0,0,0.08); }
-[data-testid="stSidebar"] { background: linear-gradient(180deg, #1b5e20 0%, #2e7d32 100%); }
-[data-testid="stSidebar"] * { color: white !important; }
-.stButton > button { background: linear-gradient(90deg, #2e7d32, #66bb6a); color: white !important; border: none; border-radius: 10px; font-weight: bold; }
-.stButton > button:hover { opacity: 0.9; transform: translateY(-1px); }
-.login-box { background: white; padding: 2.5rem; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.12); max-width: 420px; margin: auto; }
+st.markdown("""
+<style>
+.stApp { background: #f9fafb; }
+.main .block-container {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    border: 1px solid #e8f5e9;
+}
+[data-testid="stSidebar"] {
+    background: white;
+    border-right: 1px solid #e8f5e9;
+}
+[data-testid="stSidebar"] * { color: #1b5e20 !important; }
+.stButton > button {
+    background: white !important;
+    color: #2e7d32 !important;
+    border: 1.5px solid #2e7d32 !important;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.stButton > button:hover {
+    background: #2e7d32 !important;
+    color: white !important;
+}
+.stTextInput > div > input, .stSelectbox > div {
+    border-color: #c8e6c9 !important;
+    border-radius: 8px !important;
+}
+</style>
+""", unsafe_allow_html=True)
 </style>
 """, unsafe_allow_html=True)
 
