@@ -92,7 +92,7 @@ if not st.session_state.logged_in:
     st.markdown("""
     <div style='text-align:center; padding:2rem 0;'>
         <h1 style='color:#1b5e20; font-size:3rem;'> JIVO Wellness</h1>
-        <p style='color:#555; font-size:1.1rem;'>AI Assistant — Purity For Charity</p>
+        <p style='color:#555; font-size:1.1rem;'>AI Assistant - Purity For Charity</p>
     </div>
     """, unsafe_allow_html=True)
 
