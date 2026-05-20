@@ -221,7 +221,6 @@ with st.sidebar:
 
 # Main area
 st.markdown("""
-st.markdown("""
 <div style='background:white; border:1.5px solid #c8e6c9; border-left:5px solid #2e7d32;
 border-radius:12px; padding:1.2rem 1.5rem; margin-bottom:1.5rem; display:flex;
 align-items:center; gap:12px;'>
@@ -230,9 +229,6 @@ align-items:center; gap:12px;'>
         <div style='font-size:1.2rem; font-weight:600; color:#1b5e20;'>JIVO Wellness AI Assistant</div>
         <div style='font-size:0.85rem; color:#555;'>Powered by Advanced AI — Purity For Charity</div>
     </div>
-</div>
-""", unsafe_allow_html=True)
-    <p style='margin:0; opacity:0.85; font-size:0.9rem;'>Powered by Advanced AI — Purity For Charity</p>
 </div>
 """, unsafe_allow_html=True)
 
