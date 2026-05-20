@@ -3,4 +3,4 @@ langchain-core
 streamlit
 pypdf
 pandas
-openpyxl
+supabase
